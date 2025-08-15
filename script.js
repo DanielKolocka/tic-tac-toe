@@ -18,30 +18,38 @@ function gameBoard() {
     const getBoard = () => board;
 
     const placeToken = (gridSpot, player) => {
-        const row = Math.round(gridSpot/rows);
-        let column;
-        // let col = (gridSpot % columns === 0) ? 3 : (gridSpot % columns === 1) ? 1 : 2;
-        switch(gridSpot % columns) {
-            case 0:
-                column = 3;
-            case 1:
-                column = 1;
-            case 2:
-                column = 2;
-        }
-        console.log("Column: " + column);
+        const row = Math.floor(gridSpot/rows);
+        let column = gridSpot % columns;
+
         console.log("Row: " + row);
-        if (board[row][column].getValue() != 0) {
-            // Can't play this turn. Spot already taken
-            console.log("Spot already taken");
-        }
-        else {
-            // board[row][column].addToken(player);
-            console.log(player.name + "played token at: " + row + "|" + column);
+        console.log("Column: " + column);
+
+        // This flag is to determine if the turn was played. If spot already taken, player should play again
+        // let playedTurn = false;
+
+        // while (!playedTurn) {
+            if (board[row][column].getValue() != 0) {
+                // Can't play this turn. Spot already taken
+                console.log("Spot already taken");
+                return false;
+            }
+            // test this
+            else {
+                board[row][column].addToken(player);
+                console.log(player.getPlayer().name + " played token at: " + row + "|" + column);
+                // playedTurn = true;
+                return true;
+            // }
         }
     }
+// [[], [], []], [[], [], []]
+    const printBoard = () => {
+        console.log("Printing board:");
+        let tempBoard = board.map(row => row.map(cell => cell.getValue()));
+        console.log(tempBoard);
+    }
 
-    return {getBoard, placeToken};
+    return {getBoard, placeToken, printBoard};
 }
 
 /*
@@ -81,22 +89,26 @@ function Cell() {
     ];
 
     let activePlayer = players[0];
-    // console.log(activePlayer.getPlayer());
-    // console.log(players);
-    // console.log(players[0]);
 
     // Switch the active player
     const switchActivePlayer = () => {
-        activePlayer = players[0] ? players[1] : players[0];
+        activePlayer = (activePlayer == players[0]) ? players[1] : players[0];
+        console.log("Switching player to: " + activePlayer.getPlayer().name);
     }
 
 // Play a turn for the active user
     const playTurn = (gridSpot) => {
-        board.placeToken(gridSpot, activePlayer.getPlayer());
-        switchActivePlayer();
+        if (board.placeToken(gridSpot, activePlayer)) {
+            switchActivePlayer();
+        }
+        
     }
 
-    return {playTurn};
+    const showRound = () => {
+        board.printBoard();
+    }
+
+    return {playTurn, showRound};
 
   }
 
