@@ -33,16 +33,17 @@ function gameBoard() {
                 console.log("Spot already taken");
                 return false;
             }
-            // test this
             else {
                 board[row][column].addToken(player);
                 console.log(player.getPlayer().name + " played token at: " + row + "|" + column);
+                console.log(board[row][column]);
+                console.log(board[row][column].getValue());
                 // playedTurn = true;
                 return true;
             // }
         }
     }
-// [[], [], []], [[], [], []]
+
     const printBoard = () => {
         console.log("Printing board:");
         let tempBoard = board.map(row => row.map(cell => cell.getValue()));
@@ -65,9 +66,12 @@ function Cell() {
     // Accept a player's token to change the value of the cell
     const addToken = (player) => {
         value = player.getPlayer().token;
+        console.log("Value added is: " + value);
+        return;
     }
 
     const getValue = () => {
+        // console.log("Get value: " + value);
         return value;
     }
 
@@ -80,15 +84,17 @@ function Cell() {
   ** flow and state of the game's turns, as well as whether
   ** anybody has won the game
   */
-  function GameController() {
+function GameController() {
     const board = gameBoard();
+    let isWin = false;
 
     const players = [
-       Player("Daniel", "x"),
-       Player("Monika", "y")
+        Player("Daniel", "x"),
+        Player("Monika", "y")
     ];
 
     let activePlayer = players[0];
+    let count = 0;
 
     // Switch the active player
     const switchActivePlayer = () => {
@@ -96,21 +102,68 @@ function Cell() {
         console.log("Switching player to: " + activePlayer.getPlayer().name);
     }
 
-// Play a turn for the active user
+    // Play a turn for the active user
     const playTurn = (gridSpot) => {
+        //  If a move was played
         if (board.placeToken(gridSpot, activePlayer)) {
-            switchActivePlayer();
+            count++;
+            if (count >= 9) {
+                // It's a tie
+            }
+            
+            if (!isWinningMove()) {
+                // console.log("Play Turn log winner actually!");
+                console.log("not winning move!");
+                switchActivePlayer();
+            }
+            else {
+                if (isWinningMove().getValue() == 'x' || isWinningMove().getValue() == 'y') {
+                    announceWinner(activePlayer);
+                }
+                else {
+                    console.log("not winning move!");
+                    switchActivePlayer();
+                }
+            }
         }
-        
     }
 
     const showRound = () => {
         board.printBoard();
     }
 
+    const isWinningMove = () => {
+        let game = board.getBoard();
+        // Check horizonat and vertical win
+        for (let i=0; i<3; i++) {
+            if ((game[i][0].getValue() == game[i][1].getValue()) && (game[i][0].getValue() == game[i][2].getValue())) {
+                // announceWinner(activePlayer);
+                // console.log("Winner scenario 1");
+                return game[i][0];
+            }
+            else if ((game[0][i].getValue() == game[1][i].getValue()) && (game[0][i].getValue() == game[2][i].getValue())) {
+                // announceWinner(activePlayer);
+                // console.log("Winner scenario 2");
+                return game[0][i];
+            }
+        }
+        // Check diaganol win
+        if (((game[0][0].getValue() == game[1][1].getValue()) && (game[0][0].getValue() == game[2][2].getValue())) || ((game[2][0].getValue() == game[1][1].getValue()) && (game[2][0].getValue() == game[0][2].getValue()))) {
+            // announceWinner(activePlayer);
+            // console.log("Winner scenario 3");
+            return game[0][0];
+        }
+        console.log("No winner yet!");
+        return false;
+    }
+
+    const announceWinner = (winningPlayer) => {
+        console.log(winningPlayer.getPlayer().name + " has won!");
+    }
+
     return {playTurn, showRound};
 
-  }
+}
 
   function Player (playerName, playerToken) {
 
@@ -124,3 +177,6 @@ function Cell() {
     return {getPlayer}
 
   }
+
+
+  
