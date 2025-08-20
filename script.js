@@ -8,10 +8,12 @@ function gameBoard() {
     // [4], [5], [6]
     // [7], [8], [9]
 
-    for (let i = 0; i<rows; i++) {
-        board[i] = [];
-        for (let k = 0; k<columns; k++) {
-            board[i].push(Cell());
+    const initializeBoard = () => {
+        for (let i = 0; i<rows; i++) {
+            board[i] = [];
+            for (let k = 0; k<columns; k++) {
+                board[i].push(Cell());
+            }
         }
     }
 
@@ -50,7 +52,14 @@ function gameBoard() {
         console.log(tempBoard);
     }
 
-    return {getBoard, placeToken, printBoard};
+    const restartBoard = () => {
+        board.splice(0, board.length);
+        console.log(board);
+    }
+
+    initializeBoard();
+
+    return {getBoard, placeToken, printBoard, restartBoard, initializeBoard};
 }
 
 /*
@@ -108,7 +117,7 @@ function GameController() {
         if (board.placeToken(gridSpot, activePlayer)) {
             count++;
             if (count >= 9) {
-                // It's a tie
+                console.log("It's a tie!");
             }
             
             if (!isWinningMove()) {
@@ -161,7 +170,13 @@ function GameController() {
         console.log(winningPlayer.getPlayer().name + " has won!");
     }
 
-    return {playTurn, showRound};
+    const restartGame = () => {
+        console.log("Restarting the game...");
+        board.restartBoard();
+        board.initializeBoard();
+    }
+
+    return {playTurn, showRound, restartGame};
 
 }
 
