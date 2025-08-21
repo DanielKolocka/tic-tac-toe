@@ -23,8 +23,8 @@ function gameBoard() {
         const row = Math.floor(gridSpot/rows);
         let column = gridSpot % columns;
 
-        console.log("Row: " + row);
-        console.log("Column: " + column);
+        // console.log("Row: " + row);
+        // console.log("Column: " + column);
 
         // This flag is to determine if the turn was played. If spot already taken, player should play again
         // let playedTurn = false;
@@ -38,8 +38,6 @@ function gameBoard() {
             else {
                 board[row][column].addToken(player);
                 console.log(player.getPlayer().name + " played token at: " + row + "|" + column);
-                console.log(board[row][column]);
-                console.log(board[row][column].getValue());
                 // playedTurn = true;
                 return true;
             // }
@@ -116,6 +114,7 @@ function GameController() {
         //  If a move was played
         if (board.placeToken(gridSpot, activePlayer)) {
             count++;
+            // console.log("Count: " + count);
             if (count >= 9) {
                 console.log("It's a tie!");
             }
