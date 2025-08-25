@@ -94,6 +94,7 @@ function Cell() {
 function GameController() {
     const board = gameBoard();
     let isWin = false;
+    // const screenController = ScreenController();
 
     const players = [
         Player("Daniel", "x"),
@@ -175,7 +176,7 @@ function GameController() {
         board.initializeBoard();
     }
 
-    return {playTurn, showRound, restartGame};
+    return {playTurn, showRound, restartGame, getBoard: board.getBoard};
 
 }
 
@@ -192,5 +193,40 @@ function GameController() {
 
   }
 
+  function ScreenController () {
+    // const playerTurnDiv = document.querySelector('.turn');
+    const player1Name = document.querySelector('.playerName1');
+    const player1Score = document.querySelector('.playerScore1');
+    const player2Name = document.querySelector('.playerName2');
+    const player2Score = document.querySelector('.playerName2');
 
-  
+    const currentPlayerTurn = document.querySelector('.playerTurn');
+    const boardDiv = document.querySelector('.board');
+    const resetButton = document.querySelector('.resetButton');
+
+    const game = GameController();
+    const board = game.getBoard();
+
+    // Change this to a for loop that goes from 0-9 (initialization) and then create another function updateScreen which updates the values and doesn't initialize the whole board
+    const initializeBoard = () => {
+        let count=0;
+        board.forEach(row => {
+            row.forEach(cell => {
+                const newCell = document.createElement("button");
+                newCell.setAttribute("class", "cell");
+                newCell.setAttribute("id", count++);
+                newCell.textContent = cell.getValue();
+                newCell.addEventListener("click", (e) => {
+                    console.log(e.target.id);
+                    game.playTurn(e.target.id);
+                });
+                boardDiv.appendChild(newCell);
+            });
+        });
+    }
+    
+
+  }
+
+  ScreenController();
+
