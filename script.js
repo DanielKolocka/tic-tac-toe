@@ -73,7 +73,7 @@ function Cell() {
     // Accept a player's token to change the value of the cell
     const addToken = (player) => {
         value = player.getPlayer().token;
-        console.log("Value added is: " + value);
+        // console.log("Value added is: " + value);
         return;
     }
 
@@ -97,12 +97,13 @@ function GameController() {
     // const screenController = ScreenController();
 
     const players = [
-        Player("Daniel", "x"),
-        Player("Monika", "y")
+        Player("Daniel", "X"),
+        Player("Monika", "Y")
     ];
 
     let activePlayer = players[0];
     let count = 0;
+
 
     // Switch the active player
     const switchActivePlayer = () => {
@@ -126,7 +127,7 @@ function GameController() {
                 switchActivePlayer();
             }
             else {
-                if (isWinningMove().getValue() == 'x' || isWinningMove().getValue() == 'y') {
+                if (isWinningMove().getValue() == 'X' || isWinningMove().getValue() == 'Y') {
                     announceWinner(activePlayer);
                 }
                 else {
@@ -176,7 +177,11 @@ function GameController() {
         board.initializeBoard();
     }
 
-    return {playTurn, showRound, restartGame, getBoard: board.getBoard};
+    const getActivePlayer = () => {
+        return activePlayer;
+    }
+
+    return {playTurn, showRound, restartGame, getBoard: board.getBoard, getActivePlayer};
 
 }
 
@@ -205,27 +210,49 @@ function GameController() {
     const resetButton = document.querySelector('.resetButton');
 
     const game = GameController();
-    const board = game.getBoard();
+    // const board = game.getBoard();
 
     // Change this to a for loop that goes from 0-9 (initialization) and then create another function updateScreen which updates the values and doesn't initialize the whole board
     const initializeBoard = () => {
-        let count=0;
-        board.forEach(row => {
-            row.forEach(cell => {
-                const newCell = document.createElement("button");
+        // let count=0;
+        for (let i=0; i<9; i++) {
+            const newCell = document.createElement("button");
                 newCell.setAttribute("class", "cell");
-                newCell.setAttribute("id", count++);
-                newCell.textContent = cell.getValue();
+                newCell.setAttribute("id", i);
+                // newCell.textContent = cell.getValue();
+                newCell.textContent = '';
                 newCell.addEventListener("click", (e) => {
                     console.log(e.target.id);
                     game.playTurn(e.target.id);
+                    updateBoard();
                 });
                 boardDiv.appendChild(newCell);
+                
+        }
+    }
+
+    const updateBoard = () => {
+        currentPlayerTurn.textContent = `${game.getActivePlayer().getPlayer().name}'s Turn...`;
+        console.log("Player: " + game.getActivePlayer().getPlayer().name);
+        const board = game.getBoard();
+        let count = 0;
+        board.forEach(row => {
+            row.forEach(cell => {
+                const tempCell = document.getElementById(count++);
+                // console.log("Before: " + cell.getValue());
+                if (cell.getValue() == "0") {
+                    // tempCell.textContent = cell.getValue();
+                    return;
+                }
+                else {
+                    tempCell.textContent = cell.getValue();
+                }
             });
         });
     }
-    
 
+    initializeBoard();
+    return {};
   }
 
   ScreenController();
