@@ -53,6 +53,8 @@ function gameBoard() {
     const restartBoard = () => {
         board.splice(0, board.length);
         console.log(board);
+        initializeBoard();
+        console.log(board);
     }
 
     initializeBoard();
@@ -97,8 +99,8 @@ function GameController() {
     // const screenController = ScreenController();
 
     const players = [
-        Player("Daniel", "X"),
-        Player("Monika", "Y")
+        Player("Player 1", "X", 0),
+        Player("Player 2", "Y", 0)
     ];
 
     let activePlayer = players[0];
@@ -113,27 +115,23 @@ function GameController() {
 
     // Play a turn for the active user
     const playTurn = (gridSpot) => {
-        //  If a move was played
         if (board.placeToken(gridSpot, activePlayer)) {
             count++;
-            // console.log("Count: " + count);
-            if (count >= 9) {
-                console.log("It's a tie!");
-            }
+            // screen.updateBoard();
+    
+            const winner = isWinningMove();
             
-            if (!isWinningMove()) {
-                // console.log("Play Turn log winner actually!");
-                console.log("not winning move!");
-                switchActivePlayer();
-            }
-            else {
-                if (isWinningMove().getValue() == 'X' || isWinningMove().getValue() == 'Y') {
-                    announceWinner(activePlayer);
-                }
-                else {
-                    console.log("not winning move!");
-                    switchActivePlayer();
-                }
+            if (winner) {
+                screen.updateBoard();
+                announceWinner(activePlayer);
+                return; 
+            } else if (count >= 9) { //On turn 9 if it's a win that will be called before this. Otherwise, it's a tie
+                console.log("It's a tie!");
+                return;
+            } else {
+                switchActivePlayer(); 
+                screen.updateBoard();
+                return;
             }
         }
     }
@@ -144,54 +142,70 @@ function GameController() {
 
     const isWinningMove = () => {
         let game = board.getBoard();
+        showRound();
         // Check horizonat and vertical win
         for (let i=0; i<3; i++) {
-            if ((game[i][0].getValue() == game[i][1].getValue()) && (game[i][0].getValue() == game[i][2].getValue())) {
-                // announceWinner(activePlayer);
-                // console.log("Winner scenario 1");
+            if (game[i][0].getValue() != '' && (game[i][0].getValue() == game[i][1].getValue()) && (game[i][0].getValue() == game[i][2].getValue())) {
+                console.log("win 1");
                 return game[i][0];
             }
-            else if ((game[0][i].getValue() == game[1][i].getValue()) && (game[0][i].getValue() == game[2][i].getValue())) {
-                // announceWinner(activePlayer);
-                // console.log("Winner scenario 2");
+            if (game[0][i].getValue() != '' && (game[0][i].getValue() == game[1][i].getValue()) && (game[0][i].getValue() == game[2][i].getValue())) {
+                console.log("win 2");
                 return game[0][i];
             }
         }
         // Check diaganol win
-        if (((game[0][0].getValue() == game[1][1].getValue()) && (game[0][0].getValue() == game[2][2].getValue())) || ((game[2][0].getValue() == game[1][1].getValue()) && (game[2][0].getValue() == game[0][2].getValue()))) {
-            // announceWinner(activePlayer);
-            // console.log("Winner scenario 3");
-            return game[0][0];
-        }
+        if (game[1][1].getValue() != '' && 
+            ( (game[0][0].getValue() == game[1][1].getValue() && game[0][0].getValue() == game[2][2].getValue()) ||
+            (game[2][0].getValue() == game[1][1].getValue() && game[2][0].getValue() == game[0][2].getValue()) )
+            ) {
+    console.log("win 3");
+    return game[1][1];
+}
         console.log("No winner yet!");
         return false;
     }
 
     const announceWinner = (winningPlayer) => {
         console.log(winningPlayer.getPlayer().name + " has won!");
+        screen.displayWinner(winningPlayer.getPlayer());
+        // return winningPlayer.getPlayer().name;
+        return;
     }
 
     const restartGame = () => {
         console.log("Restarting the game...");
         board.restartBoard();
-        board.initializeBoard();
+        activePlayer = players[0];
+        count = 0;
+
+        // TO-DO: Reset the scores of the players
+        // board.initializeBoard();
+    }
+
+    const playNext = () => {
+        console.log("Starting next game...");
+        board.restartBoard();
+        activePlayer = players[0];
+        count = 0;
     }
 
     const getActivePlayer = () => {
         return activePlayer;
     }
 
-    return {playTurn, showRound, restartGame, getBoard: board.getBoard, getActivePlayer};
+    return {playTurn, showRound, restartGame, getBoard: board.getBoard, getActivePlayer, playNext};
 
 }
 
-  function Player (playerName, playerToken) {
+  function Player (playerName, playerToken, playerScore) {
 
     const name = playerName;
     const token = playerToken;
+    const score = playerScore;
 
     const getPlayer = () => {
-        return {name, token}
+        return {name, token, score}
     }
 
     return {getPlayer}
@@ -199,6 +213,7 @@ function GameController() {
   }
 
   function ScreenController () {
+    const game = GameController();
     // const playerTurnDiv = document.querySelector('.turn');
     const player1Name = document.querySelector('.playerName1');
     const player1Score = document.querySelector('.playerScore1');
@@ -209,51 +224,66 @@ function GameController() {
     const boardDiv = document.querySelector('.board');
     const resetButton = document.querySelector('.resetButton');
 
-    const game = GameController();
+    const dialog = document.querySelector("dialog");
+    const dialogResult = document.querySelector(".result");
+    const dialogNextButton = document.querySelector(".nextGameButton");
+    dialogNextButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        game.playNext();
+        updateBoard();
+        dialog.close();
+    });
+
+
+    resetButton.addEventListener('click', () => {
+        game.restartGame();
+        // initializeBoard();
+        updateBoard();
+        console.log("restart button clicked");
+    });
+
     // const board = game.getBoard();
 
-    // Change this to a for loop that goes from 0-9 (initialization) and then create another function updateScreen which updates the values and doesn't initialize the whole board
-    const initializeBoard = () => {
-        // let count=0;
-        for (let i=0; i<9; i++) {
-            const newCell = document.createElement("button");
-                newCell.setAttribute("class", "cell");
-                newCell.setAttribute("id", i);
-                // newCell.textContent = cell.getValue();
-                newCell.textContent = '';
-                newCell.addEventListener("click", (e) => {
-                    console.log(e.target.id);
-                    game.playTurn(e.target.id);
-                    updateBoard();
-                });
-                boardDiv.appendChild(newCell);
-                
-        }
-    }
-
     const updateBoard = () => {
-        currentPlayerTurn.textContent = `${game.getActivePlayer().getPlayer().name}'s Turn...`;
-        console.log("Player: " + game.getActivePlayer().getPlayer().name);
         const board = game.getBoard();
+        boardDiv.innerHTML = '';
+        currentPlayerTurn.textContent = `${game.getActivePlayer().getPlayer().name}'s Turn...`;
+        // TO-DO: Add the scores...
         let count = 0;
         board.forEach(row => {
             row.forEach(cell => {
-                const tempCell = document.getElementById(count++);
-                // console.log("Before: " + cell.getValue());
-                if (cell.getValue() == "0") {
-                    // tempCell.textContent = cell.getValue();
-                    return;
+                const newCell = document.createElement("button");
+                newCell.setAttribute("class", "cell");
+                newCell.setAttribute("id", count++);
+                if (cell.getValue() != "0") {
+                    newCell.textContent = cell.getValue();
                 }
-                else {
-                    tempCell.textContent = cell.getValue();
-                }
+                newCell.addEventListener("click", (e) => {
+                    // console.log(e.target.id);
+                    game.playTurn(e.target.id);
+                });
+                boardDiv.appendChild(newCell);
             });
         });
+
     }
 
-    initializeBoard();
-    return {};
+
+    // FINISH THIS: Update the current turn to display winner. And check winner market to determine which score to update +1
+    const displayWinner = (winner) => {
+        currentPlayerTurn.textContent = `${winner.name} is the winner!`;
+        console.log('winner: ' + winner.name);
+        dialogResult.textContent = `${winner.name} is the winner!`
+        dialog.showModal();
+
+    }
+
+
+    // initializeBoard();
+    updateBoard();
+    return {displayWinner, updateBoard};
+
   }
 
-  ScreenController();
+  const screen = ScreenController();
 

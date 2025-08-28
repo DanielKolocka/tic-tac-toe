@@ -11,21 +11,26 @@
     <div class="container">
         <h1 class="title">Tic Tac Toe</h1>
 
+        <dialog class="gameResult">
+            <div class="result"></div>
+            <button class="nextGameButton">Play Again!</button>
+        </dialog>
+
         <div class="playerScores">
             <div class="playerStats">
-                <h2 class="playerName1">Daniel</h2>
+                <h2 class="playerName1">Player 1</h2>
                 <h3 class="playerSymbol1">X</h3>
-                <h3 class="playerScore1">Score: 0</h3>
+                <h3 class="playerScore1">Score:</h3>
             </div>
             <div class="playerStats">
-                <h2 class="playerName2">Monika</h2>
-                <h3 class="playerSymbol2">O</h3>
-                <h3 class="playerScore2">Score: 0</h3>
+                <h2 class="playerName2">Player 2</h2>
+                <h3 class="playerSymbol2">Y</h3>
+                <h3 class="playerScore2">Score:</h3>
             </div>
         </div>
 
         <div class="turn">
-            <h3 class="playerTurn">Daniel's Turn...</h2>
+            <h3 class="playerTurn"></h2>
         </div>
 
         <div class="board">
@@ -40,7 +45,7 @@
             <button class="cell"></button> -->
         </div>
         <div class="reset">
-            <button id="resetButton">Reset Game</button>
+            <button class="resetButton">Reset Game</button>
         </div>
     </div>
 </body>
