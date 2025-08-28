@@ -130,6 +130,8 @@ function GameController() {
                 return; 
             } else if (count >= 9) { //On turn 9 if it's a win that will be called before this. Otherwise, it's a tie
                 console.log("It's a tie!");
+                screen.updateBoard();
+                announceTie();
                 return;
             } else {
                 switchActivePlayer(); 
@@ -176,6 +178,12 @@ function GameController() {
         winningPlayer.increaseScore();
         console.log(winningPlayer.getPlayer());
         return;
+    }
+
+    const announceTie = () => {
+        screen.displayTie();
+        return;
+
     }
 
     const restartGame = () => {
@@ -301,10 +309,16 @@ function GameController() {
 
     }
 
+    const displayTie = () => {
+        currentPlayerTurn.textContent = "It's a Draw!";
+        dialogResult.textContent = "It's a Draw!";
+        dialog.showModal();
+    }
+
 
     // initializeBoard();
     updateBoard();
-    return {displayWinner, updateBoard};
+    return {displayWinner, updateBoard, displayTie};
 
   }
 
