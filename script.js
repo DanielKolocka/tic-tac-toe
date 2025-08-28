@@ -106,6 +106,9 @@ function GameController() {
     let activePlayer = players[0];
     let count = 0;
 
+    const getPlayers = () => {
+        return players;
+    }
 
     // Switch the active player
     const switchActivePlayer = () => {
@@ -170,6 +173,8 @@ function GameController() {
         console.log(winningPlayer.getPlayer().name + " has won!");
         screen.displayWinner(winningPlayer.getPlayer());
         // return winningPlayer.getPlayer().name;
+        winningPlayer.increaseScore();
+        console.log(winningPlayer.getPlayer());
         return;
     }
 
@@ -178,6 +183,10 @@ function GameController() {
         board.restartBoard();
         activePlayer = players[0];
         count = 0;
+        players.forEach(player => {
+            player.resetScore();
+        });
+
 
         // TO-DO: Reset the scores of the players
         // board.initializeBoard();
@@ -194,7 +203,7 @@ function GameController() {
         return activePlayer;
     }
 
-    return {playTurn, showRound, restartGame, getBoard: board.getBoard, getActivePlayer, playNext};
+    return {playTurn, showRound, restartGame, getBoard: board.getBoard, getActivePlayer, playNext, getPlayers};
 
 }
 
@@ -202,23 +211,32 @@ function GameController() {
 
     const name = playerName;
     const token = playerToken;
-    const score = playerScore;
+    let score = playerScore;
 
     const getPlayer = () => {
         return {name, token, score}
     }
 
-    return {getPlayer}
+    const resetScore = () => {
+        score = 0;
+    }
+
+    const increaseScore = () => {
+        score++;
+    }
+
+    return {getPlayer, resetScore, increaseScore}
 
   }
 
   function ScreenController () {
     const game = GameController();
+    const players = game.getPlayers();
     // const playerTurnDiv = document.querySelector('.turn');
     const player1Name = document.querySelector('.playerName1');
     const player1Score = document.querySelector('.playerScore1');
     const player2Name = document.querySelector('.playerName2');
-    const player2Score = document.querySelector('.playerName2');
+    const player2Score = document.querySelector('.playerScore2');
 
     const currentPlayerTurn = document.querySelector('.playerTurn');
     const boardDiv = document.querySelector('.board');
@@ -248,6 +266,11 @@ function GameController() {
         const board = game.getBoard();
         boardDiv.innerHTML = '';
         currentPlayerTurn.textContent = `${game.getActivePlayer().getPlayer().name}'s Turn...`;
+
+        player1Score.innerHTML = `Score: ${players[0].getPlayer().score}`; 
+        player2Score.innerHTML = `Score: ${players[1].getPlayer().score}`; 
+
+
         // TO-DO: Add the scores...
         let count = 0;
         board.forEach(row => {
